@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Indus Inscriptions</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { margin-bottom: 5px; color: #2c3e50; }
+        p.subtitle { color: #666; margin-bottom: 30px; }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .inscription-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metadata {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+            flex-wrap: wrap;
+        }
+        .metadata span {
+            background: #ecf0f1;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .signs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: #fff;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            justify-content: center;
+            min-height: 80px;
+            align-items: center;
+        }
+
+        .sign-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .indus-sign {
+            height: 80px;
+            width: auto;
+            /* Filter to make SVG dark colored instead of default black, just for aesthetics */
+            filter: invert(24%) sepia(18%) saturate(1915%) hue-rotate(169deg) brightness(94%) contrast(89%);
+        }
+
+        .sign-number {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-family: monospace;
+        }
+
+        .raw-text {
+            margin-top: 15px;
+            font-family: monospace;
+            color: #95a5a6;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #2980b9; }
+
+        #loading { font-size: 18px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <h1>Random Indus Inscriptions</h1>
+    <p class="subtitle">Rendering actual sign sequences from the corpus using standardized SVGs</p>
+    
+    <button class="btn" onclick="renderRandomInscriptions()">🎲 Load Random Inscriptions</button>
+
+    <div id="loading">Loading corpus data...</div>
+    <div class="container" id="inscriptions-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        let allInscriptions = [];
+        const svgBaseUrl = "https://raw.githubusercontent.com/decipher-indus/font-generation/main/svgs/S";
+
+        // Load the corpus on page load
+        Papa.parse('inscriptions.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                // Filter out rows that don't have a valid text sequence (must have +...+)
+                allInscriptions = results.data.filter(row => 
+                    row.text && 
+                    row.text.includes('+') && 
+                    row.text.length > 5
+                );
+                document.getElementById('loading').style.display = 'none';
+                renderRandomInscriptions();
+            }
+        });
+
+        function getRandomItems(arr, n) {
+            let result = new Array(n),
+                len = arr.length,
+                taken = new Array(len);
+            if (n > len) throw new RangeError("getRandomItems: more elements taken than available");
+            while (n--) {
+                let x = Math.floor(Math.random() * len);
+                result[n] = arr[x in taken ? taken[x] : x];
+                taken[x] = --len in taken ? taken[len] : len;
+            }
+            return result;
+        }
+
+        function extractSigns(rawText) {
+            // Text looks like: +410-017-740-002+ or +410-017/740+
+            // Remove the + signs and split by any non-digit characters (like - or /)
+            const cleaned = rawText.replace(/\+/g, '').trim();
+            if (!cleaned) return [];
+            return cleaned.split(/[-/|]/).map(s => s.trim()).filter(s => s.match(/^\d+$/));
+        }
+
+        function renderRandomInscriptions() {
+            if (allInscriptions.length === 0) return;
+            
+            const container = document.getElementById('inscriptions-container');
+            container.innerHTML = ''; // Clear existing
+            
+            const randomPicks = getRandomItems(allInscriptions, 5);
+
+            randomPicks.forEach(row => {
+                const signs = extractSigns(row.text);
+                
+                // Build the card HTML
+                const card = document.createElement('div');
+                card.className = 'inscription-card';
+                
+                // Metadata
+                let html = `<div class="metadata">`;
+                if (row.id && row.id !== '-') html += `<span>🆔 ID: ${row.id}</span>`;
+                if (row.site && row.site !== '-') html += `<span>📍 ${row.site}</span>`;
+                if (row.material && row.material !== '-') html += `<span>🪨 ${row.material}</span>`;
+                if (row.type && row.type !== '-') html += `<span>🏺 Type: ${row.type}</span>`;
+                html += `</div>`;
+                
+                // Signs Container (Read right-to-left usually, but we'll render left-to-right as in the code)
+                html += `<div class="signs-container">`;
+                
+                if (signs.length === 0) {
+                    html += `<span>No recognizable standard signs.</span>`;
+                } else {
+                    signs.forEach(signCode => {
+                        // Pad to 3 digits (e.g. 17 -> 017)
+                        const paddedCode = signCode.padStart(3, '0');
+                        // Use the SVG from the NFM font generation repository
+                        const svgUrl = `${svgBaseUrl}${paddedCode}.svg`;
+                        
+                        html += `
+                            <div class="sign-wrapper">
+                                <img class="indus-sign" src="${svgUrl}" alt="Sign ${paddedCode}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'50\\' height=\\'80\\'><text x=\\'10\\' y=\\'40\\' font-family=\\'monospace\\' font-size=\\'12\\'>[${paddedCode}]</text></svg>'">
+                                <span class="sign-number">${paddedCode}</span>
+                            </div>
+                        `;
+                    });
+                }
+                html += `</div>`;
+                
+                // Raw text footer
+                html += `<div class="raw-text">Raw Sequence: ${row.text}</div>`;
+                if (row.translation) {
+                     html += `<div class="raw-text" style="color:#d35400;">Translation Theory: ${row.translation}</div>`;
+                }
+                
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

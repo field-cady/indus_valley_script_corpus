@@ -1,0 +1,42 @@
+# Methodology: Unsupervised Decipherment of the Indus Script via Optimal Transport
+
+## 1. Objective
+To construct a purely unsupervised, computational framework that maps the undeciphered signs of the Indus Valley script to the phonetic syllables of traditional Dravidian surnames. This approach tests the Dravidian Hypothesis by attempting to align the sequential structure (Markov transition frequencies) of the ancient script with the morphological structure of modern South Indian house names and patronymics.
+
+## 2. Theoretical Framework
+Traditional unsupervised decipherment techniques (such as those used for Linear B) rely on massive corpora of continuous sentences to build rich word embeddings (e.g., Word2Vec) for structural alignment. The Indus corpus cannot support this because the texts are exceedingly short (averaging 4-5 signs), rendering sentence-level context models ineffective.
+
+**The Morphological Workaround:**
+We bypass sentence-level context by framing the problem as **Morphological Graph Matching**. Assuming the seals primarily record personal names, titles, and lineages (the scholarly consensus), their 4-5 sign structure should mathematically mirror the 4-5 syllable structure of traditional Dravidian names. By modeling both systems as directed graphs of internal transitions, we can align them purely based on topological similarities.
+
+## 3. Data Preparation & Graph Construction
+We model both the Indus script corpus and the Dravidian surname dataset as directed graphs representing first-order Markov chains.
+
+### 3.1. The Indus Graph (Graph A)
+*   **Data Source:** The Interactive Corpus of Indus Texts (ICIT) dataset (`inscriptions.csv`), filtered specifically for artifact types designated as "Seals" (to ensure a uniform functional context).
+*   **Preprocessing (Suffix Stripping):** The Indus script is read Right-to-Left (RTL). Sign 740 (the "Jar" sign) and Sign 000 (representing damaged/illegible text) overwhelmingly appear in the terminal position (the extreme left of the transcribed string). Based on the Mahadevan/Parpola hypothesis that these are grammatical suffixes, we systematically strip terminal 740 and 000 signs from all sequences to expose the underlying noun stems.
+*   **Nodes:** The top $N$ most frequent Indus signs in the stripped sequences.
+*   **Edges:** Directed bigram transition probabilities. The weight of the edge from Sign $X$ to Sign $Y$ is the probability $P(X \rightarrow Y)$, calculated by counting how often $X$ is immediately followed by $Y$, normalized by the total outgoing degree of $X$.
+
+### 3.2. The Dravidian Graph (Graph B)
+*   **Data Source:** A curated dataset of several hundred traditional, multi-syllabic South Indian surnames (Telugu *Intiperu*, Malayalam *Tharavadu*, Tamil patronymics, and Kannada lineage names).
+*   **Preprocessing (Syllabification):** Names are programmatically split into phonetic syllables using a heuristic based on vowel clusters and leading consonant clusters.
+*   **Nodes:** The top $N$ most frequent Dravidian syllables.
+*   **Edges:** Directed bigram transition probabilities between syllables, calculated identically to the Indus graph.
+
+## 4. Graph Alignment via Optimal Transport
+To compare the topological structure of the two disjoint graphs, we convert the transition probability matrices into distance matrices:
+$D(X, Y) = 1.0 - P(X \rightarrow Y)$
+
+We then employ **Gromov-Wasserstein (GW) Optimal Transport**.
+*   GW Optimal Transport is designed to align two different metric spaces that do not share any direct features (i.e., we cannot directly compare a picture of a jar to the sound 'ar').
+*   It minimizes the discrepancy in distances: If Sign $A$ and Sign $B$ frequently co-occur (small topological distance in Graph A), their mapped counterparts Syllable $X$ and Syllable $Y$ should also frequently co-occur (small topological distance in Graph B).
+*   The algorithm computes a soft-assignment coupling matrix $T$ that represents the optimal probability mass linking each Indus sign to each Dravidian syllable.
+
+## 5. Extraction of Mappings
+For each of the top $N$ Indus signs, we identify the Dravidian syllable that receives the highest probability mass in the optimal transport coupling matrix. This represents the machine's best structural hypothesis for the phonetic value or grammatical function of that sign, derived entirely from unsupervised syntactic alignment.
+
+## 6. Academic Caveats & Limitations
+While this pipeline provides strong statistical confirmation of the structural parallels between the Indus script and Dravidian morphology (e.g., independently classifying genitive links and honorific suffixes), the specific phonetic outputs must be heavily scrutinized due to:
+1.  **Phonetic Overfitting (The "Alphabet Soup" Problem):** By forcing a 1-to-1 alignment between exact subsets (e.g., top 50 vs. top 50), the algorithm is compelled to assign mappings based on the localized distribution of the specific name dataset provided. Variations in the surname sample size or linguistic composition will alter the specific phonetic assignments, even if the structural grammar remains sound.
+2.  **The Logo-Syllabic Trap:** This model inherently assumes the Indus script is purely syllabic (1 sign = 1 syllable). Archaeological consensus strongly suggests the script is logo-syllabic (containing logograms representing whole words, and determinatives representing silent semantic categories). Forcing logograms into a syllabic transition matrix compresses and distorts the true linguistic structure.

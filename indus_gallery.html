@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indus Valley Inscriptions Gallery</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        .artifact-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .artifact-image {
+            width: 100%;
+            height: 350px;
+            object-fit: contain;
+            background-color: #e0e0e0;
+            border-bottom: 1px solid #ddd;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .artifact-info {
+            padding: 25px;
+        }
+        .artifact-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d35400;
+            margin: 0 0 10px 0;
+        }
+        .metadata {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .metadata span {
+            background: #ecf0f1;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .inscription-box {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .inscription-label {
+            font-size: 12px;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .description {
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+        /* Custom Font for Indus Script */
+        @font-face {
+            font-family: 'IndusScript';
+            src: url('IndusScript.ttf') format('truetype');
+        }
+        .indus-text {
+            font-family: 'IndusScript', sans-serif;
+            font-size: 32px;
+            color: #d35400;
+            margin-top: 10px;
+            text-align: center;
+            letter-spacing: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Indus Valley Inscriptions</h1>
+    <p class="subtitle">A visual tour of famous artifacts from the Harappan Civilization</p>
+
+    <div class="gallery">
+
+        <!-- Pashupati Seal -->
+        <div class="artifact-card">
+            <img class="artifact-image" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Shiva_Pashupati.jpg" alt="Pashupati Seal">
+            <div class="artifact-info">
+                <h2 class="artifact-title">The "Pashupati" Seal (M-304)</h2>
+                <div class="metadata">
+                    <span>📍 Mohenjo-Daro</span>
+                    <span>🪨 Steatite</span>
+                    <span>🏺 Seal</span>
+                </div>
+                <div class="inscription-box">
+                    <span class="inscription-label">Sign Sequence (ICIT IDs)</span>
+                    +304-405-320-109-808+
+                </div>
+                <div class="indus-text">
+                    <!-- Example characters mapped in the NFM font. Actual mappings vary. -->
+                    &#x12000; &#x12001; &#x12002; &#x12003; &#x12004;
+                </div>
+                <p class="description">
+                    One of the most famous and controversial seals discovered. It depicts a seated figure, often identified as a "proto-Shiva" or "Lord of the Animals" (Pashupati), surrounded by a rhinoceros, water buffalo, elephant, and tiger. The inscription at the top remains undeciphered.
+                </p>
+            </div>
+        </div>
+
+        <!-- Unicorn Seal -->
+        <div class="artifact-card">
+            <img class="artifact-image" src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Indus_seal_impression.jpg" alt="Unicorn Seal">
+            <div class="artifact-info">
+                <h2 class="artifact-title">The "Unicorn" Seal</h2>
+                <div class="metadata">
+                    <span>📍 Harappa / Mohenjo-Daro</span>
+                    <span>🪨 Steatite</span>
+                    <span>🏺 Seal Impression</span>
+                </div>
+                <div class="inscription-box">
+                    <span class="inscription-label">Sign Sequence (Example)</span>
+                    +410-017-740-002+
+                </div>
+                <p class="description">
+                    The single-horned "unicorn" bull is by far the most common motif found on Indus Valley seals, appearing on over 60% of them. It is almost always accompanied by a mysterious "standard" or "incense burner" object placed in front of it.
+                </p>
+            </div>
+        </div>
+
+        <!-- Dholavira Signboard -->
+        <div class="artifact-card">
+            <img class="artifact-image" src="https://upload.wikimedia.org/wikipedia/commons/7/76/Banner_at_the_North_Gate_of_Dholavira.svg" alt="Dholavira Signboard" style="object-fit: contain; padding: 40px;">
+            <div class="artifact-info">
+                <h2 class="artifact-title">The Dholavira Signboard</h2>
+                <div class="metadata">
+                    <span>📍 Dholavira (Gujarat)</span>
+                    <span>🪨 Gypsum</span>
+                    <span>🪵 Wooden Board (Decayed)</span>
+                </div>
+                <div class="inscription-box">
+                    <span class="inscription-label">Sign Sequence</span>
+                    +740-760-000-742-013/742-552+
+                </div>
+                <p class="description">
+                    Unlike the tiny seals, this was a massive, monumental inscription discovered near the northern gateway of the Dholavira citadel. The symbols were made of white gypsum and likely inlaid into a large wooden board. It is one of the longest single inscriptions discovered, containing ten large signs. The repeated "wheel" sign is highly visible.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
